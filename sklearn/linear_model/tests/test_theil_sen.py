@@ -8,6 +8,7 @@ import os
 import sys
 from contextlib import contextmanager
 import numpy as np
+import pytest
 from numpy.testing import assert_array_equal, assert_array_less
 from numpy.testing import assert_array_almost_equal, assert_warns
 from scipy.linalg import norm
@@ -16,7 +17,7 @@ from sklearn.exceptions import ConvergenceWarning
 from sklearn.linear_model import LinearRegression, TheilSenRegressor
 from sklearn.linear_model._theil_sen import _spatial_median, _breakdown_point
 from sklearn.linear_model._theil_sen import _modified_weiszfeld_step
-from sklearn.utils._testing import assert_almost_equal, assert_raises
+from sklearn.utils._testing import assert_almost_equal
 
 
 @contextmanager
@@ -203,19 +204,23 @@ def test_calc_breakdown_point():
 def test_checksubparams_negative_subpopulation():
     X, y, w, c = gen_toy_problem_1d()
     theil_sen = TheilSenRegressor(max_subpopulation=-1, random_state=0)
-    assert_raises(ValueError, theil_sen.fit, X, y)
+
+    with pytest.raises(ValueError):
+        theil_sen.fit(X, y)
 
 
 def test_checksubparams_too_few_subsamples():
     X, y, w, c = gen_toy_problem_1d()
     theil_sen = TheilSenRegressor(n_subsamples=1, random_state=0)
-    assert_raises(ValueError, theil_sen.fit, X, y)
+    with pytest.raises(ValueError):
+        theil_sen.fit(X, y)
 
 
 def test_checksubparams_too_many_subsamples():
     X, y, w, c = gen_toy_problem_1d()
     theil_sen = TheilSenRegressor(n_subsamples=101, random_state=0)
-    assert_raises(ValueError, theil_sen.fit, X, y)
+    with pytest.raises(ValueError):
+        theil_sen.fit(X, y)
 
 
 def test_checksubparams_n_subsamples_if_less_samples_than_features():
@@ -224,7 +229,8 @@ def test_checksubparams_n_subsamples_if_less_samples_than_features():
     X = random_state.normal(size=(n_samples, n_features))
     y = random_state.normal(size=n_samples)
     theil_sen = TheilSenRegressor(n_subsamples=9, random_state=0)
-    assert_raises(ValueError, theil_sen.fit, X, y)
+    with pytest.raises(ValueError):
+        theil_sen.fit(X, y)
 
 
 def test_subpopulation():
